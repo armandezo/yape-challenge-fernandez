@@ -1,4 +1,4 @@
-// src/kafka/kafkaProducer.ts
+// src/services/kafkaProducerService.ts
 
 import { Kafka, logLevel } from 'kafkajs';
 
@@ -9,7 +9,7 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 
-const sendMessage = async (topic: string, message: any): Promise<void> => {
+export const sendMessageToKafka = async (topic: string, message: any): Promise<void> => {
   try {
     await producer.send({
       topic,
@@ -20,5 +20,3 @@ const sendMessage = async (topic: string, message: any): Promise<void> => {
     console.error('Error sending message:', error);
   }
 };
-
-export { producer, sendMessage };

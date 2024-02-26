@@ -1,7 +1,6 @@
-// src/kafka/kafkaConsumer.ts
+// src/services/kafkaConsumerService.ts
 
 import { Kafka, logLevel } from 'kafkajs';
-import { processTransactionStatus } from '../services/transactionService';
 
 const kafka = new Kafka({
   brokers: ['localhost:9092'],
@@ -10,7 +9,7 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: 'transaction-group' });
 
-const subscribeToTopic = async (topic: string): Promise<void> => {
+export const subscribeToKafkaTopic = async (topic: string, callback: (message: any) => Promise<void>): Promise<void> => {
   await consumer.subscribe({ topic, fromBeginning: true });
 
   await consumer.run({
@@ -18,11 +17,8 @@ const subscribeToTopic = async (topic: string): Promise<void> => {
       console.log({
         value: message.value.toString(),
       });
-
-      // Aquí procesamos el mensaje recibido (por ejemplo, actualizando el estado de la transacción en la base de datos)
-      await processTransactionStatus(JSON.parse(message.value.toString()));
+      // Llamar al callback proporcionado para procesar el mensaje
+      await callback(JSON.parse(message.value.toString()));
     },
   });
 };
-
-export { consumer, subscribeToTopic };
